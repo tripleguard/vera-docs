@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vera Docs</title>
+  <meta name="description" content="Документация локального голосового агента Vera.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="page-shell">
+    <div class="orb orb-one"></div>
+    <div class="orb orb-two"></div>
+
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="https://agentvera.ru">
+          <span class="brand-mark">
+            <img src="./vera.svg" alt="" width="22" height="22">
+          </span>
+          <span>Vera Docs</span>
+        </a>
+        <nav class="top-nav">
+          <a href="#overview">Обзор</a>
+          <a href="#install">Установка</a>
+          <a href="#faq">FAQ</a>
+          <a class="header-link" href="https://github.com/tripleguard/Vera" target="_blank" rel="noreferrer">GitHub</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="docs-shell container">
+      <aside class="docs-sidebar">
+        <nav>
+          <p class="sidebar-kicker">Документация</p>
+          <a href="#overview">Обзор</a>
+          <a href="#requirements">Требования</a>
+          <a href="#install">Установка</a>
+          <a href="#interface">Интерфейс</a>
+          <a href="#commands">Команды</a>
+          <a href="#memory">Память</a>
+          <a href="#skills-tools">Skills и Tools</a>
+          <a href="#integrations">Интеграции</a>
+          <a href="#configuration">Конфигурация</a>
+          <a href="#testing">Тестирование</a>
+          <a href="#troubleshooting">Неполадки</a>
+          <a href="#faq">FAQ</a>
+          <a class="sidebar-readme" href="https://github.com/tripleguard/Vera/blob/main/README.md" target="_blank" rel="noreferrer">README на GitHub</a>
+        </nav>
+      </aside>
+
+      <article class="docs-content">
+        <section id="overview">
+          <p class="section-kicker">[ docs / актуально по README ]</p>
+          <h1>Vera</h1>
+          <p class="lead">
+            Полностью локальный голосовой агент для Windows с оффлайн-распознаванием речи,
+            встроенной локальной LLM и графическим интерфейсом.
+          </p>
+          <div class="tag-row">
+            <span class="tag">Python 3.10+</span>
+            <span class="tag">Node.js 20.19+</span>
+            <span class="tag">Windows x64</span>
+            <span class="tag">52 tests</span>
+          </div>
+          <div class="docs-note">
+            <strong>Важно.</strong> Vera может ошибаться. Проверяйте критически важные данные,
+            особенно результаты веб-поиска, курсы валют, погоду и статистику.
+          </div>
+          <h3>Основные компоненты</h3>
+          <ul>
+            <li><strong>Распознавание речи:</strong> Sherpa-ONNX, streaming и оффлайн.</li>
+            <li><strong>LLM:</strong> локальная GGUF-модель или внешний сервер Ollama / LM Studio.</li>
+            <li><strong>Синтез речи:</strong> Supertonic с локальным голосом Lily через ONNX Runtime.</li>
+            <li><strong>Интерфейс:</strong> плавающий виджет и полноценное окно чата поверх всех окон.</li>
+          </ul>
+        </section>
+
+        <section id="requirements">
+          <h2>Системные требования</h2>
+          <p>
+            С учетом встроенной локальной LLM (Qwen3.5-2B-GGUF) и нейросетевых
+            движков распознавания/синтеза речи (Sherpa-ONNX STT, Supertonic TTS):
+          </p>
+          <div class="docs-table-wrap">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Компонент</th>
+                  <th>Минимальные</th>
+                  <th>Рекомендуемые</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>ОС</td><td>Windows 10 (x64)</td><td>Windows 11 (x64)</td></tr>
+                <tr><td>Процессор (CPU)</td><td>2 ядра, с поддержкой AVX2</td><td>4+ ядер (Intel Core i5+ / AMD Ryzen)</td></tr>
+                <tr><td>ОЗУ (RAM)</td><td>8 ГБ</td><td>16 ГБ</td></tr>
+                <tr><td>Место на диске</td><td>4 ГБ</td><td>5 ГБ (на SSD)</td></tr>
+                <tr><td>Видеокарта (GPU)</td><td>Встроенная (работа LLM на CPU)</td><td>Совместимая с Vulkan (для ускорения LLM)</td></tr>
+                <tr><td>Микрофон</td><td>Любой встроенный</td><td>Внешний USB или гарнитура</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3>Для разработчиков</h3>
+          <ul>
+            <li><code>Python 3.10+</code></li>
+            <li><code>Node.js 18+</code> — требования Vite и <code>@vitejs/plugin-react</code> из <code>ui/package.json</code>.</li>
+          </ul>
+        </section>
+
+        <section id="install">
+          <h2>Установка и запуск</h2>
+          <h3>Шаг 1: Клонирование</h3>
+          <div class="code-wrap">
+            <pre class="code-block"><code>git clone https://github.com/tripleguard/Vera.git
+cd agent_vera</code></pre>
+          </div>
+          <h3>Шаг 2: Зависимости</h3>
+          <div class="code-wrap">
+            <pre class="code-block"><code>pip install -r requirements.txt</code></pre>
+          </div>
+          <p>
+            Для сетевых запросов веб-слой использует <code>niquests</code> как основной
+            HTTP-клиент с автоматическим fallback на <code>requests</code>.
+          </p>
+          <div class="code-wrap">
+            <pre class="code-block"><code>cd ui
+npm install
+cd ..</code></pre>
+          </div>
+          <h3>Шаг 3: Бинарные модели</h3>
+          <ul>
+            <li>Скачайте модель <code>sherpa-onnx-streaming-zipformer-small-ru-vosk-2025-08-16</code> и распакуйте ее в корень проекта.</li>
+            <li>Для встроенного механизма запуска скачайте GGUF-модель, например Qwen3-4B-Q4_K_M, и поместите ее в корень проекта.</li>
+          </ul>
+          <h3>Запуск</h3>
+          <div class="code-wrap">
+            <pre class="code-block"><code>cd ui
+npm start</code></pre>
+          </div>
+          <p>
+            Команда запускает Vite + Electron и автоматически поднимает Python backend
+            <code>server.py</code> из <code>.venv</code>, если окружение найдено.
+          </p>
+        </section>
+
+        <section id="interface">
+          <h2>Графический интерфейс</h2>
+          <p>
+            Vera работает в фоне через графический интерфейс с плавающим поверх остальных
+            окон виджетом. Также доступны окно чата и отдельная панель сессий.
+          </p>
+          <ul>
+            <li>Системный трей с командами открытия чата и выхода.</li>
+            <li>Сессии с переименованием, закреплением, архивированием и раздельным контекстом.</li>
+            <li>Прикрепление файлов, drag-and-drop и вставка изображений из буфера обмена.</li>
+            <li>Рабочая панель с деревом файлов и интерактивным CMD-терминалом.</li>
+            <li>Раздел «Проекты» для созданных презентаций.</li>
+            <li>Шесть тем: Обсидиан, Дневной, Терминал, Сакура, Графит и Аврора.</li>
+            <li>Индикаторы «Думает» и текущего действия инструмента.</li>
+          </ul>
+          <div class="docs-note">
+            Чтобы прервать голосовой ответ, скажите <strong>«Вера»</strong> или
+            <strong> «Вера, стоп»</strong>.
+          </div>
+        </section>
+
+        <section id="commands">
+          <h2>Примеры команд</h2>
+          <h3>Приложения, окна и система</h3>
+          <div class="code-wrap">
+            <pre class="code-block"><code>Вера, открой хром
+Вера, переключись на телеграм
+Вера, громкость 75 процентов
+Вера, сделай скриншот
+Вера, перезагрузи через час</code></pre>
+          </div>
+          <h3>Файлы, веб и продуктивность</h3>
+          <div class="code-wrap">
+            <pre class="code-block"><code>Вера, найди файл резюме
+Вера, погода в Москве
+Вера, найди информацию о Python
+Вера, таймер 10 минут
+Вера, читай мне новости каждое утро в 9:30</code></pre>
+          </div>
+          <h3>Память и создание материалов</h3>
+          <div class="code-wrap">
+            <pre class="code-block"><code>Вера, запомни меня зовут Имя
+Вера, что ты знаешь обо мне
+Вера, сделай презентацию про искусственный интеллект
+Вера, создай таблицу с расходами
+Вера, посчитай факториал 20</code></pre>
+          </div>
+        </section>
+
+        <section id="memory">
+          <h2>Архитектура памяти</h2>
+          <p>
+            Память Vera работает полностью локально без векторной базы и эмбеддингов. Основное
+            хранилище — <code>data/memory.json</code>; старый <code>data/MEMORY.md</code> мигрирует в JSON при первом запуске.
+          </p>
+          <h3>Категории фактов</h3>
+          <div class="docs-table-wrap">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Категория</th>
+                  <th>Триггеры</th>
+                  <th>Пример</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><code>identity</code></td><td>зовут, моё имя, кто я</td><td>«Меня зовут Тимур»</td></tr>
+                <tr><td><code>contact</code></td><td>@, телефон, почта, email</td><td>«мой email t@x.ru»</td></tr>
+                <tr><td><code>preference</code></td><td>люблю, нравится, ненавижу, предпочитаю</td><td>«Любит тёмный шоколад»</td></tr>
+                <tr><td><code>project</code></td><td>проект, задача, работаю над, разрабатываю</td><td>«Работаю над Vera»</td></tr>
+                <tr><td><code>fact</code></td><td>(по умолчанию)</td><td>«Есть кот по имени Барсик»</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            Для поиска используются BM25, свежесть, совпадение категории и бонус закрепленным
+            фактам. В системный промпт попадают три наиболее релевантных и закрепленные факты.
+          </p>
+        </section>
+
+        <section id="skills-tools">
+          <h2>Skills и Tools</h2>
+          <h3>Skills</h3>
+          <p>
+            Каждый skill хранится в отдельном каталоге с <code>SKILL.md</code>. Он описывает назначение,
+            правила, разрешенные инструменты и профиль модели. Vera загружает только подходящий
+            skill, чтобы не раздувать системный prompt.
+          </p>
+          <h3>Tools</h3>
+          <ul>
+            <li>Чтение документов с автоматической суммаризацией длинных файлов.</li>
+            <li>Python code interpreter в отдельном процессе с защитой от зависания.</li>
+            <li>Создание текстовых файлов, таблиц, презентаций, докладов, отчетов и статей.</li>
+          </ul>
+        </section>
+
+        <section id="integrations">
+          <h2>Интеграции</h2>
+          <h3>Внешний LLM-сервер</h3>
+          <ol>
+            <li>Откройте настройки Vera.</li>
+            <li>Включите «Внешний LLM-сервер».</li>
+            <li>Для Ollama укажите <code>http://localhost:11434/v1</code>.</li>
+            <li>Для LM Studio укажите <code>http://localhost:1234/v1</code>.</li>
+            <li>Сохраните настройки — перезапуск не требуется.</li>
+          </ol>
+          <h3>Telegram</h3>
+          <p>
+            Telegram-режим работает через Telethon и папку «Избранное» (Saved Messages).
+            Vera может находить и отправлять файлы, присылать созданные PPTX и читать сообщения
+            из переписок. Управление компьютером в этом режиме отключено из соображений безопасности.
+          </p>
+          <h3>Веб-поиск</h3>
+          <p>
+            Поиск сначала идет через Brave Search, затем при необходимости переключается на
+            DuckDuckGo Lite. Страницы загружаются параллельно, очищаются и ранжируются перед
+            передачей локальной модели.
+          </p>
+        </section>
+
+        <section id="configuration">
+          <h2>Конфигурация</h2>
+          <p>Основной файл настроек: <code>data/config.json</code>.</p>
+          <ul>
+            <li>Слово активации и таймаут тишины.</li>
+            <li><code>tts.voice_name</code>, <code>tts.total_steps</code>, <code>tts.volume</code>.</li>
+            <li>Внешние серверы LLM.</li>
+            <li>Алиасы сайтов.</li>
+          </ul>
+        </section>
+
+        <section id="testing">
+          <h2>Тестирование</h2>
+          <div class="code-wrap">
+            <pre class="code-block"><code>python tests/run_all.py</code></pre>
+          </div>
+          <p>
+            В README указано 52 теста. Они покрывают аудио и мультимодальность, память и
+            сессии, Skills, маршрутизацию tools, генерацию документов и веб-экстракцию.
+          </p>
+          <div class="code-wrap">
+            <pre class="code-block"><code>python tests/test_memory.py
+python tests/test_tool_router.py
+python tests/test_presentation_generator.py</code></pre>
+          </div>
+        </section>
+
+        <section id="troubleshooting">
+          <h2>Устранение неполадок</h2>
+          <h3>Sherpa-ONNX не загружается</h3>
+          <p>Проверьте, что каталог модели распознавания речи находится в корне проекта.</p>
+          <h3>LLM не запускается</h3>
+          <p>
+            Проверьте GGUF и наличие <code>llama-server.exe</code> с DLL. Для установленной версии
+            стандартный каталог — <code>C:\Program Files\Vera</code>.
+          </p>
+          <h3>Нет звука или не работает микрофон</h3>
+          <p>
+            Проверьте <code>tts.voice_name</code>, доступные устройства воспроизведения и
+            настройки звука в Windows.
+          </p>
+          <h3>Память забывает факты</h3>
+          <p>
+            Проверьте целостность <code>data/memory.json</code>. Лимит памяти — 20 фактов; закрепленные
+            факты сохраняются при вытеснении.
+          </p>
+        </section>
+
+        <section id="faq">
+          <h2>FAQ</h2>
+          <h3>Передает ли Vera данные в интернет?</h3>
+          <p>
+            Нет, кроме веб-поиска, погоды и курсов валют. STT и LLM работают локально
+            или на вашем внешнем сервере, если он настроен.
+          </p>
+          <h3>Можно ли изменить слово активации?</h3>
+          <p>Да, в <code>config.json</code>.</p>
+          <h3>Как прервать Веру, когда она говорит?</h3>
+          <p>Скажите «Вера» или «Вера, стоп» — она сразу остановится.</p>
+          <h3>Как работает поиск по памяти?</h3>
+          <p>
+            Последняя реплика используется как поисковый запрос. Факты ранжируются по BM25,
+            свежести, категории и бонусу закрепления; top-3 и закрепленные факты попадают в
+            системный промпт.
+          </p>
+          <h3>Можно ли закрепить факт, чтобы он не потерялся?</h3>
+          <p>
+            Да, через API <code>MemoryManager.pin(fact_id)</code>. Закрепленные факты попадают
+            в контекст и не вытесняются при достижении лимита <code>MAX_FACTS=20</code>.
+          </p>
+        </section>
+      </article>
+    </main>
+  </div>
+
+  <script src="./script.js"></script>
+</body>
+</html>
