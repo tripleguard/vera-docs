@@ -87,7 +87,7 @@ code {
   max-width: none;
   min-height: 64px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 32px;
 }
 
 .brand {
@@ -451,6 +451,10 @@ code {
 @media (max-width: 767px) {
   .container {
     width: min(100% - 24px, 1200px);
+  }
+
+  .header-inner {
+    padding: 0 20px;
   }
 
   .top-nav {
