@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./styles.css?v=7">
+  <link rel="stylesheet" href="./styles.css?v=9">
 </head>
 <body>
   <div class="page-shell">
@@ -58,6 +58,7 @@
           <a href="#install">Установка</a>
           <a href="#interface">Интерфейс</a>
           <a href="#commands">Команды</a>
+          <a href="#schedule">Расписание</a>
           <a href="#memory">Память</a>
           <a href="#skills-tools">Skills и Tools</a>
           <a href="#integrations">Интеграции</a>
@@ -66,6 +67,7 @@
           <a href="#troubleshooting">Неполадки</a>
           <a href="#faq">FAQ</a>
           <a class="sidebar-readme" href="https://github.com/tripleguard/Vera/blob/main/README.md" target="_blank" rel="noreferrer">README на GitHub</a>
+          <a class="sidebar-readme" href="./readme.html">Актуальный README</a>
         </nav>
       </aside>
 
@@ -81,7 +83,7 @@
             <span class="tag">Python 3.10+</span>
             <span class="tag">Node.js 20.19+</span>
             <span class="tag">Windows x64</span>
-            <span class="tag">52 tests</span>
+            <span class="tag">76 tests</span>
           </div>
           <div class="docs-note">
             <strong>Важно.</strong> Vera может ошибаться. Проверяйте критически важные данные,
@@ -93,6 +95,7 @@
             <li><strong>LLM:</strong> локальная GGUF-модель или внешний сервер Ollama / LM Studio.</li>
             <li><strong>Синтез речи:</strong> Supertonic с локальным голосом Lily через ONNX Runtime.</li>
             <li><strong>Интерфейс:</strong> плавающий виджет и полноценное окно чата поверх всех окон.</li>
+            <li><strong>Мультимодальность:</strong> текст и изображения передаются в локальную vision-модель через <code>mmproj</code>.</li>
           </ul>
         </section>
 
@@ -175,9 +178,12 @@ npm start</code></pre>
             <li>Сессии с переименованием, закреплением, архивированием и раздельным контекстом.</li>
             <li>Прикрепление файлов, drag-and-drop и вставка изображений из буфера обмена.</li>
             <li>Рабочая панель с деревом файлов и интерактивным CMD-терминалом.</li>
+            <li>Нижняя панель с моделью, версией приложения, периодическими задачами и потоком логов.</li>
             <li>Раздел «Проекты» для созданных презентаций.</li>
             <li>Шесть тем: Обсидиан, Дневной, Терминал, Сакура, Графит и Аврора.</li>
+            <li>Переключатель мышления с настраиваемым токенным бюджетом.</li>
             <li>Индикаторы «Думает» и текущего действия инструмента.</li>
+            <li>Служебные уведомления при автоперезапуске backend и сетевых неполадках.</li>
           </ul>
           <div class="docs-note">
             Чтобы прервать голосовой ответ, скажите <strong>«Вера»</strong> или
@@ -213,11 +219,27 @@ npm start</code></pre>
           </div>
         </section>
 
+        <section id="schedule">
+          <h2>Периодические задачи и напоминания</h2>
+          <p>
+            Vera умеет создавать таймеры, напоминания и повторяющиеся задачи голосом или через GUI.
+            Визуальное расписание доступно в нижней панели интерфейса.
+          </p>
+          <div class="code-wrap">
+            <pre class="code-block"><code>Вера, таймер 10 минут
+Вера, напомни завтра в 9 утра проверить отчёт
+Вера, читай мне новости каждое утро в 9:30
+Вера, запускай Telegram каждый день в 9 утра</code></pre>
+          </div>
+        </section>
+
         <section id="memory">
           <h2>Архитектура памяти</h2>
           <p>
-            Память Vera работает полностью локально без векторной базы и эмбеддингов. Основное
-            хранилище — <code>data/memory.json</code>; старый <code>data/MEMORY.md</code> мигрирует в JSON при первом запуске.
+            Память Vera работает полностью локально без векторной базы и эмбеддингов.
+            Профиль и долгосрочные факты хранятся в <code>data/memory.json</code>, а история
+            диалогов и сессии — в <code>data/vera.db</code>. Старый <code>data/MEMORY.md</code>
+            мигрирует в JSON при первом запуске.
           </p>
           <h3>Категории фактов</h3>
           <div class="docs-table-wrap">
@@ -257,6 +279,7 @@ npm start</code></pre>
             <li>Чтение документов с автоматической суммаризацией длинных файлов.</li>
             <li>Python code interpreter в отдельном процессе с защитой от зависания.</li>
             <li>Создание текстовых файлов, таблиц, презентаций, докладов, отчетов и статей.</li>
+            <li>Единый маршрутизатор намерений выбирает только релевантные tools, чтобы не раздувать prompt.</li>
           </ul>
         </section>
 
@@ -282,6 +305,11 @@ npm start</code></pre>
             DuckDuckGo Lite. Страницы загружаются параллельно, очищаются и ранжируются перед
             передачей локальной модели.
           </p>
+          <h3>Погода и курсы валют</h3>
+          <p>
+            Погода использует город из запроса или поле <code>город</code> в памяти пользователя.
+            Курсы валют берутся из ЦБ РФ.
+          </p>
         </section>
 
         <section id="configuration">
@@ -301,9 +329,22 @@ npm start</code></pre>
             <pre class="code-block"><code>python tests/run_all.py</code></pre>
           </div>
           <p>
-            В README указано 52 теста. Они покрывают аудио и мультимодальность, память и
+            В README указано 76 тестов. Они покрывают аудио и мультимодальность, память и
             сессии, Skills, маршрутизацию tools, генерацию документов и веб-экстракцию.
           </p>
+          <div class="docs-table-wrap">
+            <table class="docs-table">
+              <thead>
+                <tr><th>Область</th><th>Что покрывает</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Аудио и мультимодальность</td><td>TTS, поиск GGUF-модели и передача изображений.</td></tr>
+                <tr><td>Голосовой контроль</td><td>Команды «Вера», «стоп» и защита от отправки стоп-фраз в LLM.</td></tr>
+                <tr><td>Память и сессии</td><td>Дедупликация, лимиты, pinned-факты, геоконтекст, архивирование.</td></tr>
+                <tr><td>Веб и погода</td><td>Очистка веб-ответов, fallback-экстрактор и погодные ответы с городом из памяти.</td></tr>
+              </tbody>
+            </table>
+          </div>
           <div class="code-wrap">
             <pre class="code-block"><code>python tests/test_memory.py
 python tests/test_tool_router.py
@@ -329,6 +370,11 @@ python tests/test_presentation_generator.py</code></pre>
           <p>
             Проверьте целостность <code>data/memory.json</code>. Лимит памяти — 20 фактов; закрепленные
             факты сохраняются при вытеснении.
+          </p>
+          <h3>Backend перезапускается</h3>
+          <p>
+            GUI покажет служебное уведомление об автоперезапуске. Если попытки исчерпаны,
+            перезапустите приложение и проверьте логи backend.
           </p>
         </section>
 
@@ -359,6 +405,6 @@ python tests/test_presentation_generator.py</code></pre>
     </main>
   </div>
 
-  <script src="./script.js?v=7"></script>
+  <script src="./script.js?v=9"></script>
 </body>
 </html>
