@@ -1,13 +1,11 @@
-import { writeFile } from 'node:fs/promises';
+import { readFile, writeFile } from 'node:fs/promises';
 
 const readmeUrl = 'https://raw.githubusercontent.com/tripleguard/Vera/main/README.md';
+const localReadmePath = process.env.VERA_README_PATH;
 
-const response = await fetch(readmeUrl);
-if (!response.ok) {
-  throw new Error(`Failed to fetch README: ${response.status} ${response.statusText}`);
-}
-
-const markdown = await response.text();
+const markdown = localReadmePath
+  ? await readFile(localReadmePath, 'utf8')
+  : await fetchRemoteReadme();
 const tests = markdown.match(/tests-(\d+)%20passing/i)?.[1] ?? markdown.match(/Покрытие \((\d+) тест/i)?.[1];
 
 if (!tests) {
@@ -18,15 +16,22 @@ const html = await readText('index.html');
 const assetVersion = html.match(/styles\.css\?v=(\d+)/)?.[1] ?? '1';
 const nextHtml = html
   .replace(/\d+\s+tests/g, `${tests} tests`)
-  .replace(/README указано \d+ тест(?:а|ов)?/g, `README указано ${tests} тестов`);
+  .replace(/README указано \d+ тест(?:а|ов)?/g, `README указано ${formatRussianTests(tests)}`);
 
 await writeFile('index.html', nextHtml);
 await writeFile('upstream-readme.md', markdown);
 await writeFile('readme.html', renderReadme(markdown, tests, assetVersion));
 
 async function readText(path) {
-  const { readFile } = await import('node:fs/promises');
   return readFile(path, 'utf8');
+}
+
+async function fetchRemoteReadme() {
+  const response = await fetch(readmeUrl);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch README: ${response.status} ${response.statusText}`);
+  }
+  return response.text();
 }
 
 function escapeHtml(value) {
@@ -42,6 +47,15 @@ function inlineMarkdown(value) {
     .replace(/`([^`]+)`/g, '<code>$1</code>')
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
     .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noreferrer">$1</a>');
+}
+
+function formatRussianTests(value) {
+  const count = Number(value);
+  const mod10 = count % 10;
+  const mod100 = count % 100;
+  if (mod10 === 1 && mod100 !== 11) return `${value} тест`;
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return `${value} теста`;
+  return `${value} тестов`;
 }
 
 function renderReadme(markdownText, testsCount, assetVersion) {
