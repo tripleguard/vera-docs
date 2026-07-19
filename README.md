@@ -19,7 +19,7 @@
 
 ## Синхронизация README
 
-Workflow `.github/workflows/sync-readme.yml` раз в 6 часов и вручную запускает
+Workflow `.github/workflows/sync-readme.yml` раз в час и вручную запускает
 `scripts/sync-readme.mjs`: он подтягивает актуальный README из `tripleguard/Vera`,
 обновляет счётчик тестов в `index.html`, сохраняет `upstream-readme.md` и
-генерирует `readme.html` как зеркальную HTML-версию README.
+генерирует `readme.html` как зеркальную HTML-версию README, включая таблицы.

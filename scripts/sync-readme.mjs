@@ -7,6 +7,7 @@ const markdown = localReadmePath
   ? await readFile(localReadmePath, 'utf8')
   : await fetchRemoteReadme();
 const tests = markdown.match(/tests-(\d+)%20passing/i)?.[1] ?? markdown.match(/Покрытие \((\d+) тест/i)?.[1];
+const coverage = markdown.match(/Покрытие \((\d+) тест(?:а|ов)?(?: и (\d+) subtests?)?/i);
 
 if (!tests) {
   throw new Error('Could not find tests count in README');
@@ -16,7 +17,12 @@ const html = await readText('index.html');
 const assetVersion = html.match(/styles\.css\?v=(\d+)/)?.[1] ?? '1';
 const nextHtml = html
   .replace(/\d+\s+tests/g, `${tests} tests`)
-  .replace(/README указано \d+ тест(?:а|ов)?/g, `README указано ${formatRussianTests(tests)}`);
+  .replace(/README указано \d+ тест(?:а|ов)?/g, `README указано ${formatRussianTests(tests)}`)
+  .replace(/Бейдж README показывает \d+ passing/g, `Бейдж README показывает ${tests} passing`)
+  .replace(
+    /\d+ тест(?:а|ов)? и \d+ subtests?/g,
+    coverage ? `${formatRussianTests(coverage[1])}${coverage[2] ? ` и ${coverage[2]} subtests` : ''}` : formatRussianTests(tests),
+  );
 
 await writeFile('index.html', nextHtml);
 await writeFile('upstream-readme.md', markdown);
@@ -72,7 +78,30 @@ function renderReadme(markdownText, testsCount, assetVersion) {
     }
   };
 
-  for (const line of lines) {
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index];
+
+    if (line.trim().startsWith('|') && isTableSeparator(lines[index + 1] ?? '')) {
+      closeList();
+      const headers = parseTableRow(line);
+      const rows = [];
+      index += 2;
+
+      while (index < lines.length && lines[index].trim().startsWith('|')) {
+        rows.push(parseTableRow(lines[index]));
+        index += 1;
+      }
+
+      index -= 1;
+      body.push(
+        '<div class="docs-table-wrap"><table class="docs-table">',
+        `<thead><tr>${headers.map((cell) => `<th>${inlineMarkdown(cell)}</th>`).join('')}</tr></thead>`,
+        `<tbody>${rows.map((row) => `<tr>${row.map((cell) => `<td>${inlineMarkdown(cell)}</td>`).join('')}</tr>`).join('')}</tbody>`,
+        '</table></div>',
+      );
+      continue;
+    }
+
     if (line.startsWith('```')) {
       if (inCode) {
         body.push(`<div class="code-wrap"><pre class="code-block"><code>${escapeHtml(code.join('\n'))}</code></pre></div>`);
@@ -102,7 +131,7 @@ function renderReadme(markdownText, testsCount, assetVersion) {
     if (heading) {
       closeList();
       const level = Math.min(heading[1].length, 3);
-      body.push(`<h${level}>${inlineMarkdown(heading[2])}</h${level}>`);
+      body.push(`<h${level} id="${headingId(heading[2])}">${inlineMarkdown(heading[2])}</h${level}>`);
       continue;
     }
 
@@ -144,4 +173,27 @@ function renderReadme(markdownText, testsCount, assetVersion) {
 </body>
 </html>
 `;
+}
+
+function parseTableRow(line) {
+  return line
+    .trim()
+    .replace(/^\|/, '')
+    .replace(/\|$/, '')
+    .split('|')
+    .map((cell) => cell.trim());
+}
+
+function isTableSeparator(line) {
+  const cells = parseTableRow(line);
+  return cells.length > 0 && cells.every((cell) => /^:?-{3,}:?$/.test(cell.replaceAll(' ', '')));
+}
+
+function headingId(value) {
+  return value
+    .toLowerCase()
+    .replace(/[`*]/g, '')
+    .replace(/[^\p{L}\p{N}\s-]/gu, '')
+    .trim()
+    .replace(/\s+/g, '-');
 }
