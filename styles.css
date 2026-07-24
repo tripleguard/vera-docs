@@ -69,14 +69,14 @@ code {
   left: 0;
   top: 0;
   z-index: 50;
-  border-bottom: 1px solid transparent;
+  border-bottom: 1px solid rgb(255 255 255 / 0.12);
   background: rgb(9 11 15 / 0.8);
   backdrop-filter: blur(24px);
   transition: border-color 160ms ease;
 }
 
 .site-header-scrolled {
-  border-bottom-color: var(--border);
+  border-bottom-color: rgb(255 255 255 / 0.12);
 }
 
 .header-inner {
